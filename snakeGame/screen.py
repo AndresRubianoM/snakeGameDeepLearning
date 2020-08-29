@@ -68,14 +68,14 @@ class Screen:
 		
 
 						
-	def game_cycle(self):
+	def game_cycle(self, items):
 
-		items = {
-			'mobile_items':
-							{'Snake': Snake([self.number_spaces[0]//2, self.number_spaces[1]//2], self.number_spaces)},
-			'static_items':
-							{'Prey': Prey(self.number_spaces)}
-		}
+		#items = {
+		#	'mobile_items':
+		#					{'Snake': Snake([self.number_spaces[0]//2, self.number_spaces[1]//2], self.number_spaces)},
+		#	'static_items':
+		#					{'Prey': Prey(self.number_spaces)}
+		#}
 		
 		while self.running:
 			pygame.event.get()
