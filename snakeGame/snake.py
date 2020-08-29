@@ -53,15 +53,15 @@ class Snake:
     limits = list[max_x, max_y]
     """
 
-    def __init__(self, position, limits):
-        self.position = position
+    def __init__(self, limits):
+        self.position = [limits[0]//2, limits[1]//2]
         self.limits = limits
 
-        self.body = [Square(position)]
+        self.body = [Square(self.position)]
         self.velocities = [0,0]
         
         self.punctuation = 0
-        self.previous_data = []
+        self.previous_data = [self.body[0].position]
 
     
     def movement(self, event):
@@ -127,15 +127,20 @@ class Snake:
     def dead_condition(self):
         head = self.body[0].position
         body = [part.position for part in self.body[1:]]
-        print(head, body)
+        #print(head, body)
         if head in body:
-            self.body = [self.body[0]]
-            self.body[0].position = [(self.limits[0]//2), (self.limits[1]//2)]
+            self._reset_game()
+            return True
+        else:
+            return False
 
-            self.punctuation = 0 
+
+    def _reset_game(self):
+        self.body = [self.body[0]]
+        self.body[0].position = [(self.limits[0]//2), (self.limits[1]//2)]
+        self.punctuation = 0 
 
              
-        
     def draw(self, screen, rows, columns):
         for square in self.body:
             square.draw(screen, rows, columns)
