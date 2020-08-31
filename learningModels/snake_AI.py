@@ -7,7 +7,12 @@ from snakeGame.screen import Screen
 
 
 class SnakeAI(Snake):
-    """Snake class prepare for the enviroment"""
+    """Snake class child, adapted to be part of the environment of 
+    tf-agents framework.
+
+    limits: [x,y] ints 
+
+    """
 
     def __init__(self, limits):
         super(SnakeAI, self).__init__(limits)
@@ -15,8 +20,10 @@ class SnakeAI(Snake):
         self.complete_map = np.zeros(limits, dtype=np.float32)
     
     def movement(self, action):
-        #UP: 0    LEFT: 2
-        #DOWN: 1  RIGHT: 3
+        """Changes in the direction of snake's movement
+        UP: 0    LEFT: 2
+        DOWN: 1  RIGHT: 3
+        """
 
         #if its moving horizontally only can move vertically in the next move
         if self.velocities[1] == 0:
@@ -36,12 +43,11 @@ class SnakeAI(Snake):
                 self.velocities[0] = 1
                 self.velocities[1] = 0
         
-        #execute displacement
-        #print('before: ', self.body[0].position)
         self.displacement()
-        #print('after: ', self.body[0].position)
 
     def eat(self):
+        "Condition to win points"
+
         if self.prey.position == self.body[0].position:
             self.punctuation += 1
             self.prey.relocation(self.body)
@@ -52,6 +58,8 @@ class SnakeAI(Snake):
 
 
     def complete_mapping(self):
+        """Binary map of the full game"""
+
         self._reset_map()
         position_prey = self.prey.position
         position_body = [part.position for part in self.body]
@@ -64,6 +72,9 @@ class SnakeAI(Snake):
 
 
     def state(self):
+        """State for the learning process, returns a binary array, 
+        1 if the condition is true 0 if not."""
+
         #Mark in wich direction is the prey
         prescence_prey_right = 1 if (self.prey.position[0] > self.body[0].position[0]) else 0
         prescence_prey_left = 1 if (self.prey.position[0] < self.body[0].position[0]) else 0
@@ -107,6 +118,9 @@ class SnakeAI(Snake):
 
     
     def near_way(self):
+        """Evaluate if the snake's head is approaching to the prey
+        position"""
+
         prey_position = np.array(self.prey.position)
         actual_position = np.array(self.previous_data[-1])
         previous_position = np.array(self.previous_data[-2])
