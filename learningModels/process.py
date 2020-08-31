@@ -27,7 +27,8 @@ from tf_agents.trajectories import trajectory
 from learningModels.GameEnv import SnakeGameEnv
 
 class LearningProcess:
-    """All process for reinforce learning"""
+    """All process for reinforce learning using deep Q-network, for
+    snake game"""
 
     #Instance of the game environment
     env = SnakeGameEnv()
@@ -39,7 +40,7 @@ class LearningProcess:
     eval_env = tf_py_environment.TFPyEnvironment(limit_env_eval)
 
     #HYPERPARAMETERS
-    num_iterations = 200
+    num_iterations = 2000
     #Replay parameters
     initial_collect_steps = 1000
     collect_steps_per_iteration = 1
@@ -84,15 +85,17 @@ class LearningProcess:
 
     
     def policy(self):
-        """Policies for the initial data collection"""
+        """Policies for the initial data recopilation"""
+
         self.random_policy = random_tf_policy.RandomTFPolicy(
                                                     self.train_env.time_step_spec(),
                                                     self.train_env.action_spec()
                                                     )
 
+
     def def_replay_buffer(self):
-        """Save a determinated number of steps"""
-        #Define the parameters 
+        """Define the buffer properties""" 
+
         self.replay_buffer = tf_uniform_replay_buffer.TFUniformReplayBuffer(
             data_spec = self.agent.collect_data_spec,
             batch_size = self.train_env.batch_size,
@@ -112,20 +115,21 @@ class LearningProcess:
             num_steps = 2
         ).prefetch(3)
         
-        #Make it the dataset iterable
         self.iterator = iter(dataset)
 
 
-    def pre_learning_process(self):
-        """Simplifies the necesary steps before running the network"""
+    def pre_training_process(self):
+        """Simplifies the necesary steps before the training process, 
+        executes the methods of the current class."""
         self.network()
         self.def_agent()
         self.policy()
         self.def_replay_buffer()
         self.collect_data()
 
+
     def training(self):
-        """Training process"""
+        """Training process of the agent in the defined environment"""
 
         self.agent.train = common.function(self.agent.train)
         #Counter of steps
@@ -186,7 +190,17 @@ class LearningProcess:
         plt.show()
 
 
+    def _save_points_dir(self):
+        """Path to the directory where the policy will be saved"""
+
+        current_path = os.path.abspath(os.getcwd())
+        policy_dir = os.path.join(current_path, 'control_point')
+        return policy_dir
+
+
     def policy_saver (self):
+        """Save the policy in the directory path defined by the
+        mehtod _save_points_dir from the current class"""
         
         save_dir = self._save_points_dir()
         tf_policy_saver = policy_saver.PolicySaver(self.agent.policy)
@@ -194,7 +208,11 @@ class LearningProcess:
         print('\nThe policy of the deep Q network is saved in: "{}"'.format(save_dir))
   
 
-    def get_save_policy(self, screen):
+    def play_previous_policy(self, screen):
+        """Run the last policty trained in a pygame screen to evaluate how
+        the agent is palying the game"""
+
+        #Load the last policy trained
         saved_policy = tf.compat.v2.saved_model.load(self._save_points_dir())
         num_episodes = 1
         time_step = self.eval_env.reset()
@@ -207,26 +225,19 @@ class LearningProcess:
 		}
         
         while not time_step.is_last():
+            #Evaluates the policy
             action_step = saved_policy.action(time_step) 
             time_step = self.eval_env.step(action_step.action)
-            #print(self.env.snake.complete_mapping())
+            #Screen of pygame
             screen.start_pygame()
             screen.update_window_frame(items)
             time.sleep(0.2)
             
 
-    def _save_points_dir(self):
-        current_path = os.path.abspath(os.getcwd())
-        policy_dir = os.path.join(current_path, 'control_point')
-        return policy_dir
-
-
-
-
-
 
 def collect_step(environment, policy, buffer):
-    """Execute the step in the environment and add it to the buffer following the respective policy"""
+    """Execute the step in the environment and add it to the buffer  
+    """
 
     time_step = environment.current_time_step()
     action_step = policy.action(time_step)
@@ -237,7 +248,9 @@ def collect_step(environment, policy, buffer):
 
 
 def compute_avg_return(environment, policy, num_episodes=10):
-    """Execute the network predictions into the enivronment"""
+    """Execute the network predictions into the enivronment and evaluates its average
+    result"""
+
     total_return = 0.0
 
     for _ in range(num_episodes):
