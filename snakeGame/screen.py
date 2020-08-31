@@ -6,6 +6,7 @@ from .snake import Snake
 
 class Screen:
 	"""Manage the pygame screen with its properties"""
+	
 	def __init__(self, width, height, number_spaces, frame_rate):
 		self.width      = width
 		self.height     = height 
@@ -19,12 +20,12 @@ class Screen:
 
 
 	def start_pygame(self):
-		'''Initialize the pygame objects to run the screen'''
+		"""Initialize the pygame objects to run the screen"""
+
 		#Instance the pygame objects 
 		pygame.init()
 		self.screen = pygame.display.set_mode([self.width, self.height])
-		pygame.display.set_caption('Game Window')
-				
+		pygame.display.set_caption('Game Window')		
 		#Control the frame rate 
 		self.clock = pygame.time.Clock()
 
@@ -52,6 +53,8 @@ class Screen:
 
 	
 	def events_handler(self, game_items):
+		"""Manage the evetns to execute the game items actions"""
+
 		#Exit of the screen game with the x button
 		for event in pygame.event.get():
 			if event.type == pygame.QUIT:
@@ -69,13 +72,7 @@ class Screen:
 
 						
 	def game_cycle(self, items):
-
-		#items = {
-		#	'mobile_items':
-		#					{'Snake': Snake([self.number_spaces[0]//2, self.number_spaces[1]//2], self.number_spaces)},
-		#	'static_items':
-		#					{'Prey': Prey(self.number_spaces)}
-		#}
+		"""Infinite loop while the game is executing"""
 		
 		while self.running:
 			pygame.event.get()
