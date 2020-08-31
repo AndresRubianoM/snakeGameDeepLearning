@@ -88,7 +88,9 @@ class Snake:
 
 
     def displacement(self):
-        "Pass the change of velocity to move and rules of displacement"
+        """Pass the change of velocity to move the snake and rules of displacement
+        in the screen"""
+
         #Applied the move to the snake head
         self.body[0].velocities = self.velocities
         self.body[0].make_move() 
@@ -114,10 +116,15 @@ class Snake:
         
           
     def eat(self, prey):
+        """Condition to win points"""
+
         if prey.position == self.body[0].position:
             self.punctuation += 1
             prey.relocation(self.body)
             self.grow()
+            return True
+        else:
+            return False
     
 
     def grow(self):
