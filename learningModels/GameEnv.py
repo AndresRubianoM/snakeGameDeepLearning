@@ -13,7 +13,7 @@ class SnakeGameEnv(py_environment.PyEnvironment):
 
     def __init__(self):
         #Object of snake Game
-        limits = [10,10]
+        limits = [30,30]
         self.snake = SnakeAI(limits)
         #Shape and limits of the possible actions
         self._action_spec = array_spec.BoundedArraySpec(
