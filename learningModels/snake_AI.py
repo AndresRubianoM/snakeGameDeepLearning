@@ -19,6 +19,7 @@ class SnakeAI(Snake):
         self.prey = Prey(self.limits)
         self.complete_map = np.zeros(limits, dtype=np.float32)
     
+    
     def movement(self, action):
         """Changes in the direction of snake's movement
         UP: 0    LEFT: 2

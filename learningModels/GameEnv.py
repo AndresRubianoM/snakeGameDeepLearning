@@ -11,16 +11,13 @@ from tf_agents.trajectories import time_step as ts
 class SnakeGameEnv(py_environment.PyEnvironment):
     """Enviroment of the snake game"""
 
-    def __init__(self):
+    def __init__(self, snake):
         #Object of snake Game
-        limits = [30,30]
-        self.snake = SnakeAI(limits)
+        self.snake = snake
         #Shape and limits of the possible actions
         self._action_spec = array_spec.BoundedArraySpec(
             shape=(), dtype=np.int32, minimum=0, maximum=3)
         #Shape and limits of the observations (not the state)
-        #self._observation_spec = array_spec.BoundedArraySpec(
-        #   shape=(limits[0]*limits[1],), dtype=np.int32, minimum=0.0, maximum=1.0, name='observation')
         self._observation_spec = array_spec.BoundedArraySpec(
             shape=(12, ), dtype=np.int32, minimum=0, name='observation')
         

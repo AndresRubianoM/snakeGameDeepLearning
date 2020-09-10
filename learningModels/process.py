@@ -31,13 +31,15 @@ class LearningProcess:
     snake game"""
 
     #Instance of the game environment
-    env = SnakeGameEnv()
-    #Limits in each episodes
-    limit_env_train = TimeLimit(env, 1000)
-    limit_env_eval = TimeLimit(env, 1000)
-    #Tensor environment
-    train_env = tf_py_environment.TFPyEnvironment(limit_env_train)
-    eval_env = tf_py_environment.TFPyEnvironment(limit_env_eval)
+    def __init__(self, GameEnvironment):
+        self.env = GameEnvironment
+
+        #Limits in each episodes
+        self.limit_env_train = TimeLimit(self.env, 1000)
+        self.limit_env_eval = TimeLimit(self.env, 1000)
+        #Tensor environment
+        self.train_env = tf_py_environment.TFPyEnvironment(self.limit_env_train)
+        self.eval_env = tf_py_environment.TFPyEnvironment(self.limit_env_eval)
 
     #HYPERPARAMETERS
     num_iterations = 2000
@@ -52,6 +54,7 @@ class LearningProcess:
     log_interval = 50
     num_eval_episodes = 10
     eval_interval = 100
+
 
     
     def network(self):
@@ -105,6 +108,7 @@ class LearningProcess:
 
     def collect_data(self):
         """Collect the initial data for the buffer"""
+        
         for _ in range(self.initial_collect_steps):
             collect_step(self.train_env, self.random_policy, self.replay_buffer)
         
@@ -118,7 +122,7 @@ class LearningProcess:
         self.iterator = iter(dataset)
 
 
-    def pre_training_process(self):
+    def pre_learning_process(self):
         """Simplifies the necesary steps before the training process, 
         executes the methods of the current class."""
         self.network()
@@ -160,12 +164,9 @@ class LearningProcess:
                     #Evaluates the behaviour while the network is training
                     avg_return = compute_avg_return(self.eval_env, self.agent.policy, self.num_eval_episodes)
                     print('step = {}: Average Return = {}'.format(step, avg_return))
-                    returns.append(avg_return)
-                    
-                
-        self.visualization(returns, losses)
-        self.policy_saver()
-
+                    returns.append(avg_return)             
+        #self.visualization(returns, losses)
+        #self.policy_saver()
         return returns, losses
     
 
@@ -194,7 +195,7 @@ class LearningProcess:
         """Path to the directory where the policy will be saved"""
 
         current_path = os.path.abspath(os.getcwd())
-        policy_dir = os.path.join(current_path, 'control_point')
+        policy_dir = os.path.join(current_path, 'trained_agents', self.env.snake.__class__.__name__)
         return policy_dir
 
 
