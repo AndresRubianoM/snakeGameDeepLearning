@@ -112,7 +112,7 @@ class Snake:
         for i, snake_part in enumerate(self.body[1:]):
             snake_part.position = self.previous_data[-(i + 2)]
         
-        self.dead_condition()
+        #self.dead_condition()
         
           
     def eat(self, prey):
