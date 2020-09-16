@@ -46,6 +46,7 @@ class SnakeAI(Snake):
         
         self.displacement()
 
+
     def eat(self):
         "Condition to win points"
 
