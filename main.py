@@ -2,10 +2,20 @@ from snakeGame.screen import Screen
 
 from learningModels.process import LearningProcess
 from learningModels.snake_AI import SnakeAI
+from learningModels.snake_AI_borders import SnakeAIBorders
+
 from learningModels.GameEnv import SnakeGameEnv
 
 def training():
     snake = SnakeAI([30,30])
+    agent_environment = SnakeGameEnv(snake)
+    Lp = LearningProcess(agent_environment)
+    Lp.pre_learning_process()
+    Lp.training() 
+    Lp.policy_saver()
+
+def training_2():
+    snake = SnakeAIBorders([30,30])
     agent_environment = SnakeGameEnv(snake)
     Lp = LearningProcess(agent_environment)
     Lp.pre_learning_process()
@@ -22,12 +32,9 @@ def playing_AI():
     Lp.play_previous_policy(screen)
     
 
-
-
-
 if __name__ == "__main__":
-    training()
-    playing_AI()
+    training_2()
+    #playing_AI()
     
 
     
