@@ -42,7 +42,7 @@ class LearningProcess:
         self.eval_env = tf_py_environment.TFPyEnvironment(self.limit_env_eval)
 
     #HYPERPARAMETERS
-    num_iterations = 2000
+    num_iterations = 15000
     #Replay parameters
     initial_collect_steps = 1000
     collect_steps_per_iteration = 1
@@ -51,9 +51,9 @@ class LearningProcess:
     learning_rate = 0.00025
     batch_size = 500
     #Performance analysis parameters
-    log_interval = 50
-    num_eval_episodes = 10
-    eval_interval = 100
+    log_interval = 100
+    num_eval_episodes = 5
+    eval_interval = 250
 
 
     
@@ -165,7 +165,7 @@ class LearningProcess:
                     avg_return = compute_avg_return(self.eval_env, self.agent.policy, self.num_eval_episodes)
                     print('step = {}: Average Return = {}'.format(step, avg_return))
                     returns.append(avg_return)             
-        #self.visualization(returns, losses)
+        self.visualization(returns, losses)
         #self.policy_saver()
         return returns, losses
     
