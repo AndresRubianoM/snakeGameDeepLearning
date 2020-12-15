@@ -27,8 +27,26 @@ from tf_agents.trajectories import trajectory
 from learningModels.GameEnv import SnakeGameEnv
 
 class LearningProcess:
-    """All process for reinforce learning using deep Q-network, for
-    snake game"""
+    """All process to train and evaluate the reinforce learning method using deep Q-networks
+       GameEnvironment (obejct: PyEnvironment): Necesary environement to get use in the learning
+                                                process.
+                                                
+        *The learning parameters have been fixed"""
+   
+    #HYPERPARAMETERS
+    num_iterations = 6000
+    #Replay parameters
+    initial_collect_steps = 1000
+    collect_steps_per_iteration = 1
+    replay_buffer_max_length = 100000
+    #Learning parameters
+    learning_rate = 0.00025
+    batch_size = 500
+    #Performance analysis parameters
+    log_interval = 150
+    num_eval_episodes = 5
+    eval_interval = 300
+
 
     #Instance of the game environment
     def __init__(self, GameEnvironment):
@@ -41,27 +59,14 @@ class LearningProcess:
         self.train_env = tf_py_environment.TFPyEnvironment(self.limit_env_train)
         self.eval_env = tf_py_environment.TFPyEnvironment(self.limit_env_eval)
 
-    #HYPERPARAMETERS
-    num_iterations = 15000
-    #Replay parameters
-    initial_collect_steps = 1000
-    collect_steps_per_iteration = 1
-    replay_buffer_max_length = 100000
-    #Learning parameters
-    learning_rate = 0.00025
-    batch_size = 500
-    #Performance analysis parameters
-    log_interval = 100
-    num_eval_episodes = 5
-    eval_interval = 250
-
-
     
     def network(self):
-        """Define the deep network"""
+        """Define the deep network layers"""
 
+        #Hidden layers
         fc_layer_param = (128,128,128)
 
+        #Configuration of the tf-agents class 
         self.q_agent = q_network.QNetwork(
             self.train_env.observation_spec(),  #Define input (State)
             self.train_env.action_spec(),       #Define Output (actions)
@@ -124,7 +129,7 @@ class LearningProcess:
 
     def pre_learning_process(self):
         """Simplifies the necesary steps before the training process, 
-        executes the methods of the current class."""
+           executing the necesary methods"""
         self.network()
         self.def_agent()
         self.policy()
@@ -133,7 +138,7 @@ class LearningProcess:
 
 
     def training(self):
-        """Training process of the agent in the defined environment"""
+        """Training process of the agent with the defined environment"""
 
         self.agent.train = common.function(self.agent.train)
         #Counter of steps
@@ -164,8 +169,9 @@ class LearningProcess:
                     #Evaluates the behaviour while the network is training
                     avg_return = compute_avg_return(self.eval_env, self.agent.policy, self.num_eval_episodes)
                     print('step = {}: Average Return = {}'.format(step, avg_return))
-                    returns.append(avg_return)             
-        self.visualization(returns, losses)
+                    returns.append(avg_return) 
+                                
+        #self.visualization(returns, losses)
         #self.policy_saver()
         return returns, losses
     
