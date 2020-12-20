@@ -9,12 +9,10 @@ import time
 from tf_agents.environments import utils
 from tf_agents.environments.wrappers import TimeLimit
 from tf_agents.environments import tf_py_environment
-
 #Agents
 from tf_agents.networks import q_network
 from tf_agents.agents.dqn import dqn_agent
 from tf_agents.utils import common
-
 #Policies
 from tf_agents.policies import random_tf_policy
 from tf_agents.policies import policy_saver
@@ -22,7 +20,6 @@ from tf_agents.policies import policy_saver
 from tf_agents.replay_buffers import tf_uniform_replay_buffer
 #Trajectories
 from tf_agents.trajectories import trajectory
-
 #Game 
 from learningModels.GameEnv import SnakeGameEnv
 
@@ -34,25 +31,25 @@ class LearningProcess:
         *The learning parameters have been fixed"""
    
     #HYPERPARAMETERS
-    num_iterations = 6000
+    num_iterations = 2000
     #Replay parameters
     initial_collect_steps = 1000
     collect_steps_per_iteration = 1
-    replay_buffer_max_length = 100000
+    replay_buffer_max_length = 10000
     #Learning parameters
-    learning_rate = 0.00025
-    batch_size = 500
+    learning_rate = 0.000025
+    batch_size = 2000
     #Performance analysis parameters
-    log_interval = 150
-    num_eval_episodes = 5
-    eval_interval = 300
+    log_interval = 500
+    num_eval_episodes = 10
+    eval_interval = 2000
 
 
     #Instance of the game environment
     def __init__(self, GameEnvironment):
         self.env = GameEnvironment
 
-        #Limits in each episodes
+        #Limits in each episode of the environment
         self.limit_env_train = TimeLimit(self.env, 1000)
         self.limit_env_eval = TimeLimit(self.env, 1000)
         #Tensor environment
@@ -138,7 +135,12 @@ class LearningProcess:
 
 
     def training(self):
-        """Training process of the agent with the defined environment"""
+        """Training process of the agent with the defined environment.
+        Each 'log_interval' iterations will be printed the loss of the network
+        and each 'eval_interval' the newtork will eval 'num_eval_episodes' episodes.
+
+        returns two arrays with the informaition of the evalutaion and the losses.
+        """
 
         self.agent.train = common.function(self.agent.train)
         #Counter of steps
@@ -163,7 +165,8 @@ class LearningProcess:
 
                 if step % self.log_interval == 0:
                     print('step = {}: loss = {}'.format(step, train_loss))
-                    losses.append(train_loss)
+                    losses.append([train_loss.numpy()])
+                    
 
                 if step % self.eval_interval == 0:
                     #Evaluates the behaviour while the network is training
@@ -201,7 +204,7 @@ class LearningProcess:
         """Path to the directory where the policy will be saved"""
 
         current_path = os.path.abspath(os.getcwd())
-        policy_dir = os.path.join(current_path, 'trained_agents', self.env.snake.__class__.__name__)
+        policy_dir = os.path.join(current_path, 'trained_agents', self.env.snake.__class__.__name__ + '_{}_{}'.format(self.env._observation_spec.shape[0], self.env.reward_values))
         return policy_dir
 
 
@@ -243,22 +246,21 @@ class LearningProcess:
 
 
 def collect_step(environment, policy, buffer):
-    """Execute the step in the environment and add it to the buffer  
+    """Execute the step in the environment and add it to the buffer.
     """
 
     time_step = environment.current_time_step()
     action_step = policy.action(time_step)
     next_time_step = environment.step(action_step.action)
     traj = trajectory.from_transition(time_step, action_step, next_time_step)
-
     buffer.add_batch(traj)
 
 
 def compute_avg_return(environment, policy, num_episodes=10):
-    """Execute the network predictions into the enivronment and evaluates its average
-    result"""
+    """Execute the network predictions into the environment and evaluates its average
+    result."""
 
-    total_return = 0.0
+    total_return = []
 
     for _ in range(num_episodes):
         time_step = environment.reset()
@@ -269,10 +271,11 @@ def compute_avg_return(environment, policy, num_episodes=10):
             time_step = environment.step(action_step.action)
             episode_return += time_step.reward
         
-        total_return += episode_return
+        total_return.append(episode_return.numpy()[0])
     
-    avg_return = total_return / num_episodes
-    return avg_return.numpy()[0]
+    #avg_return = total_return / num_episodes
+    #return avg_return.numpy()[0]
+    return total_return
 
 
 
