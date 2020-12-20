@@ -1,8 +1,8 @@
 import tensorflow as tf 
 import numpy as np
 #Snake Game class
-from learningModels.snake_AI import SnakeAI
-#Reinforce learning
+from learningModels.typesSnakeGame import SnakeAI
+#Reinforce learning 
 from tf_agents.environments import py_environment
 from tf_agents.specs import array_spec
 from tf_agents.trajectories import time_step as ts
@@ -13,21 +13,20 @@ class SnakeGameEnv(py_environment.PyEnvironment):
        to use the reinforced learning methods display by the tf-agents library
        
        snake (object): Snake game class
-       dead_punish (int): Punish value when the snake lost the game"""
+       dead_punish (dictionary): Rewards values when the snake aprox, eat and dead"""
 
-    def __init__(self, snake, dead_punish):
+    def __init__(self, snake, rewards, input_data):
         #Object of snake Game
         self.snake = snake
         #Punish of the snake when died
-        self.punish = dead_punish
+        self.reward_values = rewards
         #Shape and limits of the possible actions
         self._action_spec = array_spec.BoundedArraySpec(
             shape=(), dtype=np.int32, minimum=0, maximum=3)
         #Shape and limits of the observations (not the state)
         self._observation_spec = array_spec.BoundedArraySpec(
-            shape=(33, ), dtype=np.int64, minimum=0, name='observation')
-        
-        self._state = self.snake.state() #complete_map.ravel()
+            shape=(input_data, ), dtype=np.int64, minimum=0, name='observation')
+        self._state = self.snake.state() 
         self._episode_ended = False
 
 
@@ -48,9 +47,9 @@ class SnakeGameEnv(py_environment.PyEnvironment):
 
     def _step(self, action):
 
-        #if self.snake.dead_condition():
-            #print(yolo)
-            #return self._reset()
+        if self.snake.dead_condition():
+            return self._reset()
+            
 
         if action in [0,1,2,3]:
             self.snake.movement(action)
@@ -61,15 +60,16 @@ class SnakeGameEnv(py_environment.PyEnvironment):
 
         #Posible rewards of the environment
         reward = 0   
-        reward += 10 if self.snake.eat() else 0 
-        reward += 1 if self.snake.near_way() else -1
+        reward += self.reward_values['eat'][0] if self.snake.eat() else self.reward_values['eat'][1]
+        reward += self.reward_values['aprox'][0] if self.snake.near_way() else self.reward_values['aprox'][1]
 
         #Condition to continue or finish the game
         if self.snake.dead_condition():
-            reward += self.punish
+            reward += self.reward_values['dead'][0]
             return ts.termination(self._state, reward)
         else:
             return ts.transition(self._state, reward, discount=0.95)
             
+    
 
  
