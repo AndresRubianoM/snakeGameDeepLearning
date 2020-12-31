@@ -31,18 +31,18 @@ class LearningProcess:
         *The learning parameters have been fixed"""
    
     #HYPERPARAMETERS
-    num_iterations = 2000
+    num_iterations = 75000
     #Replay parameters
-    initial_collect_steps = 1000
+    initial_collect_steps = 40000
     collect_steps_per_iteration = 1
-    replay_buffer_max_length = 10000
+    replay_buffer_max_length = 80000
     #Learning parameters
     learning_rate = 0.000025
-    batch_size = 2000
+    batch_size = 4000
     #Performance analysis parameters
-    log_interval = 500
+    log_interval = 3000
     num_eval_episodes = 10
-    eval_interval = 2000
+    eval_interval = 5000
 
 
     #Instance of the game environment
@@ -52,9 +52,11 @@ class LearningProcess:
         #Limits in each episode of the environment
         self.limit_env_train = TimeLimit(self.env, 1000)
         self.limit_env_eval = TimeLimit(self.env, 1000)
+        self.limit_env_sample = TimeLimit(self.env, 30000)
         #Tensor environment
         self.train_env = tf_py_environment.TFPyEnvironment(self.limit_env_train)
         self.eval_env = tf_py_environment.TFPyEnvironment(self.limit_env_eval)
+        self.sample_env = tf_py_environment.TFPyEnvironment(self.limit_env_sample)
 
     
     def network(self):
@@ -174,56 +176,35 @@ class LearningProcess:
                     print('step = {}: Average Return = {}'.format(step, avg_return))
                     returns.append(avg_return) 
                                 
-        #self.visualization(returns, losses)
-        #self.policy_saver()
         return returns, losses
     
-
-    def visualization(self, returns, losses):
-        """"""
-        fig, ax = plt.subplots(1, 2)
-        #Title
-        fig.suptitle('Training process performance', fontsize=16)
-        #Data
-        iterations_avg = range(0, self.num_iterations + 1, self.eval_interval)
-        iterations_loss = range(0, self.num_iterations, self.log_interval)
-        #Graph 1
-        ax[0].plot(iterations_avg, returns)
-        ax[0].set_ylabel('Average Return')
-        ax[0].set_xlabel('Iterations')
-        ax[0].set_title('Evolution of the Average Return ')
-        #Graph 2
-        ax[1].plot(iterations_loss, losses)
-        ax[1].set_ylabel('Loss')
-        ax[1].set_xlabel('Iterations')
-        ax[1].set_title('Evolution of the loss')
-        plt.show()
-
 
     def _save_points_dir(self):
         """Path to the directory where the policy will be saved"""
 
         current_path = os.path.abspath(os.getcwd())
-        policy_dir = os.path.join(current_path, 'trained_agents', self.env.snake.__class__.__name__ + '_{}_{}'.format(self.env._observation_spec.shape[0], self.env.reward_values))
+        policy_dir = os.path.join(current_path, 'trained_agents', self.env.snake.__class__.__name__ + '_{}'.format(self.env._observation_spec.shape[0]))
         return policy_dir
 
 
-    def policy_saver (self):
+    def policy_saver (self, reward=0,iteration=0):
         """Save the policy in the directory path defined by the
         mehtod _save_points_dir from the current class"""
         
-        save_dir = self._save_points_dir()
+        save_dir = self._save_points_dir() + '_{}_{}'.format(str(reward), str(iteration))
+        print(save_dir)
         tf_policy_saver = policy_saver.PolicySaver(self.agent.policy)
         tf_policy_saver.save(save_dir)
         print('\nThe policy of the deep Q network is saved in: "{}"'.format(save_dir))
+        return save_dir
   
 
-    def play_previous_policy(self, screen):
+    def play_previous_policy(self, screen, reward=0, iteration=0):
         """Run the last policty trained in a pygame screen to evaluate how
         the agent is palying the game"""
 
         #Load the last policy trained
-        saved_policy = tf.compat.v2.saved_model.load(self._save_points_dir())
+        saved_policy = self.load_previous_policy(reward, iteration)
         num_episodes = 1
         time_step = self.eval_env.reset()
         
@@ -242,8 +223,11 @@ class LearningProcess:
             screen.start_pygame()
             screen.update_window_frame(items)
             time.sleep(0.2)
-            
+    
+    def load_previous_policy(self, reward=0, iteration=0):
+        return tf.compat.v2.saved_model.load(self._save_points_dir() + '_{}_{}'.format(str(reward), str(iteration)))
 
+            
 
 def collect_step(environment, policy, buffer):
     """Execute the step in the environment and add it to the buffer.
@@ -273,8 +257,7 @@ def compute_avg_return(environment, policy, num_episodes=10):
         
         total_return.append(episode_return.numpy()[0])
     
-    #avg_return = total_return / num_episodes
-    #return avg_return.numpy()[0]
+
     return total_return
 
 
