@@ -7,8 +7,8 @@ from .snake_AI import SnakeAI
 class SnakeAIBorders(SnakeAI):
     """Snake class with defined borders for training."""
 
-    def __init__(self, limits):
-        super(SnakeAIBorders, self).__init__(limits)
+    def __init__(self, limits, snake_sight=2):
+        super(SnakeAIBorders, self).__init__(limits, snake_sight)
         self.border_out = False
         
     
@@ -67,7 +67,7 @@ class SnakeAIBorders(SnakeAI):
         """
 
         #Radious arround the head
-        limit_sight = 2
+        limit_sight = self.snake_sight
         head = self.body[0].position
         binary_map_complete = self.complete_mapping()
         map_matrix = np.matrix(binary_map_complete)
