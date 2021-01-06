@@ -15,11 +15,13 @@ class SnakeGameEnv(py_environment.PyEnvironment):
        snake (object): Snake game class
        dead_punish (dictionary): Rewards values when the snake aprox, eat and dead"""
 
-    def __init__(self, snake, rewards, input_data):
+    def __init__(self, snake, rewards, input_data, test=False):
         #Object of snake Game
         self.snake = snake
         #Punish of the snake when died
         self.reward_values = rewards
+        self.points = 0
+        self.testing = test
         #Shape and limits of the possible actions
         self._action_spec = array_spec.BoundedArraySpec(
             shape=(), dtype=np.int32, minimum=0, maximum=3)
@@ -61,6 +63,9 @@ class SnakeGameEnv(py_environment.PyEnvironment):
         #Posible rewards of the environment
         reward = 0   
         reward += self.reward_values['eat'][0] if self.snake.eat() else self.reward_values['eat'][1]
+        self.points = 0 
+        if reward > 0:  
+            self.points += 1
         reward += self.reward_values['aprox'][0] if self.snake.near_way() else self.reward_values['aprox'][1]
 
         #Condition to continue or finish the game
