@@ -224,13 +224,24 @@ class LearningProcess:
             screen.update_window_frame(items)
             time.sleep(0.2)
     
+
     def load_previous_policy(self, reward=0, iteration=0):
+        """Load the defined policy.
+
+        reward (int): Id of the reward.
+        iteration (int): desired iteration.
+        
+        """
         return tf.compat.v2.saved_model.load(self._save_points_dir() + '_{}_{}'.format(str(reward), str(iteration)))
 
             
 
 def collect_step(environment, policy, buffer):
     """Execute the step in the environment and add it to the buffer.
+
+    environment (object): Environment of the game.
+    policy (object): network.
+    buffer (object): data for training.
     """
 
     time_step = environment.current_time_step()
@@ -242,7 +253,12 @@ def collect_step(environment, policy, buffer):
 
 def compute_avg_return(environment, policy, num_episodes=10):
     """Execute the network predictions into the environment and evaluates its average
-    result."""
+    result.
+
+    environment (object): Environment of the game.
+    policy (object): network.
+    num_episodes (int): number of samples to be taken.
+    """
 
     total_return = []
 
@@ -259,6 +275,26 @@ def compute_avg_return(environment, policy, num_episodes=10):
     
 
     return total_return
+
+
+def points_history(environment, policy, num_episodes=10):
+    episodes_return = []
+
+    for _ in range(num_episodes):
+        time_step = environment.reset()
+        episode_return = 0.0
+        step_return = []
+
+        while not time_step.is_last():
+            action_step = policy.action(time_step)
+            time_step = environment.step(action_step.action)
+            episode_return += environment._env._envs[0]._env.points
+            step_return.append(episode_return)
+        
+        episodes_return.append(step_return)
+        
+    return episodes_return
+
 
 
 
