@@ -95,15 +95,8 @@ class SnakeAI(Snake):
         actual_direction_up = 1 if (self.velocities[1] == -1) else 0
         actual_direction_down = 1 if (self.velocities[1] == 1) else 0
         #Mark if is an obstacle
-        body = [part.position for part in self.body]
-        body_x = [part[0] for part in body]
-        body_y = [part[1] for part in body]
-        obstacle_right = 1 if ((self.body[0].position[0] + 1) in body_x) else 0
-        obstacle_left = 1 if ((self.body[0].position[0] - 1) in body_x) else 0
-        obstacle_up = 1 if ((self.body[0].position[1] - 1) in body_y) else 0
-        obstacle_down = 1 if ((self.body[0].position[1] + 1) in body_y) else 0
-        #return np.array([self.prey.position[0], self.prey.position[1], self.body[0].position[0], self.body[0].position[1]])
         obstacles = np.ravel(self.obstacles())
+        
         return (np.concatenate((
             [prescence_prey_right,
             prescence_prey_left,
@@ -117,20 +110,6 @@ class SnakeAI(Snake):
             )))
 
         
-        return np.array([
-            prescence_prey_right,
-            prescence_prey_left,
-            prescence_prey_up,
-            prescence_prey_down,
-            actual_direction_right,
-            actual_direction_left,
-            actual_direction_up,
-            actual_direction_down,
-            obstacle_right,
-            obstacle_left,
-            obstacle_up,
-            obstacle_down,])
-
     
     def obstacles(self):
 
