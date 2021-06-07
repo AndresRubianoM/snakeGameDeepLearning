@@ -31,7 +31,7 @@ class LearningProcess:
         *The learning parameters have been fixed"""
    
     #HYPERPARAMETERS
-    num_iterations = 75000
+    num_iterations = 150000 #75000
     #Replay parameters
     initial_collect_steps = 40000
     collect_steps_per_iteration = 1
@@ -41,7 +41,7 @@ class LearningProcess:
     batch_size = 4000
     #Performance analysis parameters
     log_interval = 3000
-    num_eval_episodes = 10
+    num_eval_episodes = 5 #10
     eval_interval = 5000
 
 
@@ -50,7 +50,7 @@ class LearningProcess:
         self.env = GameEnvironment
 
         #Limits in each episode of the environment
-        self.limit_env_train = TimeLimit(self.env, 1000)
+        self.limit_env_train = TimeLimit(self.env, 30000)
         self.limit_env_eval = TimeLimit(self.env, 1000)
         self.limit_env_sample = TimeLimit(self.env, 30000)
         #Tensor environment
@@ -158,23 +158,24 @@ class LearningProcess:
             for _ in range(self.collect_steps_per_iteration):
                 #Save the step make it with the actual neural network
                 collect_step(self.train_env, self.agent.collect_policy, self.replay_buffer)
-                #Previous states for replay experience
-                experience, unused_info = next(self.iterator)
-                #Loss of the network 
-                train_loss = self.agent.train(experience).loss
-                #Actual step
-                step = self.agent.train_step_counter.numpy()
 
-                if step % self.log_interval == 0:
-                    print('step = {}: loss = {}'.format(step, train_loss))
-                    losses.append([train_loss.numpy()])
+            #Previous states for replay experience
+            experience, unused_info = next(self.iterator)
+            #Loss of the network 
+            train_loss = self.agent.train(experience).loss
+            #Actual step
+            step = self.agent.train_step_counter.numpy()
+
+            if step % self.log_interval == 0:
+                print('step = {}: loss = {}'.format(step, train_loss))
+                losses.append([train_loss.numpy()])
                     
 
-                if step % self.eval_interval == 0:
-                    #Evaluates the behaviour while the network is training
-                    avg_return = compute_avg_return(self.eval_env, self.agent.policy, self.num_eval_episodes)
-                    print('step = {}: Average Return = {}'.format(step, avg_return))
-                    returns.append(avg_return) 
+            if step % self.eval_interval == 0:
+                #Evaluates the behaviour while the network is training
+                avg_return = compute_avg_return(self.eval_env, self.agent.policy, self.num_eval_episodes)
+                print('step = {}: Average Return = {}'.format(step, avg_return))
+                returns.append(avg_return) 
                                 
         return returns, losses
     
