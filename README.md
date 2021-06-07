@@ -9,7 +9,7 @@ My priority is to show the analysis and process of building useful reinforced le
 
 # Context 
 
-Before starting the analysis of the problem I must explain a little more what characteristics have both the model and the game.
+Before starting the analysis of the problem I must explain a little more what characteristics have both, the model and the game.
 
 Let's start with the model, As I mentioned I'll be using the Deep-Q network. the model's theory isn't too difficult but could be a little tricky at a first glance. 
 
@@ -49,7 +49,7 @@ also, we need to include a little more information about the situation of the pl
 
 Although I already named the general description of the parameters/data we need to define, it's necessary to be more specific about the reasons for my decisions and the scope of this analysis. In the beginning, I mentioned that my purpose of this analysis is to build a "useful" model but here start the first question, what exactly is a "useful" model? this has an answer that may change depending on the user and the problem. On this occasion where the problem is a game, a "useful" model could mean to building a model that plays better than the average human.
 
-Mesure how good is player depends on the game, in this game, there's only one way to obtain points but there are different paths to choose to accomplish that and we need to define the best parameters that copy the behavior we consider appropriate for our standards. To do this we need to test different policies because changing the value of the reward and punishment the model will execute different strategies with the intent of getting the maximum reward.
+Mesure how good is a player depends on the game, in this game, there's only one way to obtain points but there are different paths to choose to accomplish that and we need to define the best parameters that copy the behavior we consider appropriate for our standards. To do this we need to test different policies because changing the value of the reward and punishment the model will execute different strategies with the intent of getting the maximum reward.
 
 With all of this in mind, we have to test different combinations of parameters but we don't have infinite time or computational resources, so we need to limit the number of combinations to a number that matches our limitations.
 
