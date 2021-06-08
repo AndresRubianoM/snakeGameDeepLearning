@@ -41,6 +41,10 @@ As stated before the model I used is the Deep-Q network, to use this model we ne
 - input variables: Since the space of movement is discretized we can represent everything as a binary map where 1 means that the square is occupied with something and 0 means that the square is empty,
 also, we need to include a little more information about the situation of the player like in which direction is the prey and in which direction is the player moving.
 
+<p align="center">
+  <img src="https://github.com/AndresRubianoM/snakeGameDeepLearning/blob/master/binaryMap.png" alt="binary map"/>
+</p>
+
 - output: Is simple to answer this because there are only 4 types of movements (up, down, left, or right)
 
 - number of neurons and number of hidden layers: To be strictly defining the number of neurons and hidden layers is a complete process that implies testing different configurations and checks the effectiveness of every each of them, but if we include these new possibilities into the analysis the combinations of the parameters increases a lot more of the necessary and doesn't contribute to the purpose of the analysis.
@@ -58,6 +62,10 @@ In my case I used google collab (free), this tool has a limit of 12 hours so the
 - 2 types of games (with and without borders)
 
 - 3 different sizes for the input variables where the binary maps change
+
+<p align="center">
+  <img src="https://github.com/AndresRubianoM/snakeGameDeepLearning/blob/master/snakeImg.png" alt="snake game"/>
+</p>
 
 - Use the same architecture for all the models, using the rule of 2^n for the max number of input variables.
 
