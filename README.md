@@ -78,5 +78,18 @@ In my case I used google collab (free), this tool has a limit of 12 hours so the
 with these conditions, each model needs approx 10 hours, so in the end, we need 2*3*6*10 = 360 hours (~15 days).
 
 
+### The full explanation about the analysis process
+
+In the next link is the jupyter notebook of one model following different policies (there are three of them but only this has the explanation, the other only present the results).
+
+[Analysis process](https://github.com/AndresRubianoM/snakeGameDeepLearning/blob/master/analysis_1c.ipynb)
+
+and in this notebook is the last conclusions comparing the best policies obtained in each analysis.
+
+[Final comparasion](https://github.com/AndresRubianoM/snakeGameDeepLearning/blob/master/analysis_size.ipynb)
+
+
+
+
 
 
